@@ -46,7 +46,12 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-uint16_t adcRawData[30];
+uint16_t adcRawData[31];
+uint16_t Voltage = 0;
+uint16_t sum_Voltage = 0;
+uint16_t sum_Temp = 0;
+uint16_t avg_Voltage = 0;
+uint16_t avg_Temp = 0;
 
 /* USER CODE END PV */
 
@@ -56,6 +61,7 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
+void avg_number();
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -337,8 +343,31 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
-		HAL_ADC_Start_DMA(&hadc1, &adcRawData, 30);
+		sum_Voltage = 0;
+		sum_Temp = 0;
+		avg_Voltage = 0;
+		avg_Temp = 0;
+		HAL_ADC_Start_DMA(&hadc1, &adcRawData, 31);
+		avg_number();
 	}
+}
+
+void avg_number()
+{
+	for(int i=0;i<30;i++)
+	{
+		if(i%3 == 0)
+		{
+			Voltage = (((adcRawData[i]*3300)/4095)*2);
+			sum_Voltage = (sum_Voltage + (((adcRawData[i]*3300)/4095)*2));
+		}
+		else if (i%3 == 2)
+		{
+			sum_Temp = (sum_Temp + adcRawData[i]);
+		}
+	}
+	avg_Voltage = sum_Voltage/10;
+	avg_Temp = sum_Temp/10;
 }
 
 /* USER CODE END 4 */
