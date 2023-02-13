@@ -48,10 +48,14 @@ UART_HandleTypeDef huart2;
 
 uint16_t adcRawData[31];
 uint16_t Voltage = 0;
+float Temp_V = 0;
+float Temp_C = 0;
+float Temp_F = 0;
 uint16_t sum_Voltage = 0;
-uint16_t sum_Temp = 0;
+float sum_Temp = 0;
 uint16_t avg_Voltage = 0;
-uint16_t avg_Temp = 0;
+float avg_Temp = 0;
+
 
 /* USER CODE END PV */
 
@@ -358,12 +362,15 @@ void avg_number()
 	{
 		if(i%3 == 0)
 		{
-			Voltage = (((adcRawData[i]*3300)/4095)*2);
-			sum_Voltage = (sum_Voltage + (((adcRawData[i]*3300)/4095)*2));
+			Voltage = ((adcRawData[i]*3300)/4095)*2;
+			sum_Voltage = (sum_Voltage + Voltage);
 		}
 		else if (i%3 == 2)
 		{
-			sum_Temp = (sum_Temp + adcRawData[i]);
+			Temp_V = ((adcRawData[i]*3300)/4095);
+			Temp_C = (((Temp_V-760)/(2.5))/1000)+25;
+			Temp_F = (Temp_C*(9/5))+32;
+			sum_Temp = (sum_Temp + Temp_F);
 		}
 	}
 	avg_Voltage = sum_Voltage/10;
