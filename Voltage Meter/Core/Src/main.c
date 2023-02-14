@@ -46,7 +46,7 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-uint16_t adcRawData[31];
+uint16_t adcRawData[30];
 uint16_t Voltage = 0;
 float Temp_V = 0;
 float Temp_C = 0;
@@ -65,7 +65,6 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_ADC1_Init(void);
-void avg_number();
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -117,6 +116,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	static uint32_t timestamp = 0;
+		if(HAL_GetTick()>=timestamp)
+		{
+			timestamp = HAL_GetTick() + 1000;
+			avg_number();
+		}
   }
   /* USER CODE END 3 */
 }
@@ -346,15 +351,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
-		sum_Voltage = 0;
-		sum_Temp = 0;
-		HAL_ADC_Start_DMA(&hadc1, &adcRawData, 31);
- 		avg_number();
+		HAL_ADC_Start_DMA(&hadc1, &adcRawData, 30);
 	}
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+
 }
 
 void avg_number()
 {
+	sum_Voltage = 0;
+	sum_Temp = 0;
 	for(int i=0;i<30;i++)
 	{
 		if(i%3 == 0)
@@ -366,7 +375,7 @@ void avg_number()
 		{
 			Temp_V = ((adcRawData[i]*3300)/4095);
 			Temp_C = (((Temp_V-760)/(2.5))/1000)+25;
-			Temp_K = (Temp_C+273.15);
+			Temp_K = (Temp_C + 273.15);
 			sum_Temp = (sum_Temp + Temp_K);
 		}
 	}
