@@ -50,7 +50,7 @@ uint16_t adcRawData[31];
 uint16_t Voltage = 0;
 float Temp_V = 0;
 float Temp_C = 0;
-float Temp_F = 0;
+float Temp_K = 0;
 uint16_t sum_Voltage = 0;
 float sum_Temp = 0;
 uint16_t avg_Voltage = 0;
@@ -117,7 +117,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
   }
   /* USER CODE END 3 */
 }
@@ -349,10 +348,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		sum_Voltage = 0;
 		sum_Temp = 0;
-		avg_Voltage = 0;
-		avg_Temp = 0;
 		HAL_ADC_Start_DMA(&hadc1, &adcRawData, 31);
-		avg_number();
+ 		avg_number();
 	}
 }
 
@@ -363,14 +360,14 @@ void avg_number()
 		if(i%3 == 0)
 		{
 			Voltage = ((adcRawData[i]*3300)/4095)*2;
-			sum_Voltage = (sum_Voltage + Voltage);
+			sum_Voltage = sum_Voltage + Voltage;
 		}
 		else if (i%3 == 2)
 		{
 			Temp_V = ((adcRawData[i]*3300)/4095);
 			Temp_C = (((Temp_V-760)/(2.5))/1000)+25;
-			Temp_F = (Temp_C*(9/5))+32;
-			sum_Temp = (sum_Temp + Temp_F);
+			Temp_K = (Temp_C+273.15);
+			sum_Temp = (sum_Temp + Temp_K);
 		}
 	}
 	avg_Voltage = sum_Voltage/10;
