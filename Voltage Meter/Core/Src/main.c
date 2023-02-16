@@ -355,11 +355,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-
-}
-
 void avg_number()
 {
 	sum_Voltage = 0;
@@ -368,12 +363,12 @@ void avg_number()
 	{
 		if(i%3 == 0)
 		{
-			Voltage = ((adcRawData[i]*3300)/4095)*2;
+			Voltage = ((adcRawData[i]*3300)/4096)*2;
 			sum_Voltage = sum_Voltage + Voltage;
 		}
 		else if (i%3 == 2)
 		{
-			Temp_V = ((adcRawData[i]*3300)/4095);
+			Temp_V = ((adcRawData[i]*3300)/4096);
 			Temp_C = (((Temp_V-760)/(2.5))/1000)+25;
 			Temp_K = (Temp_C + 273.15);
 			sum_Temp = (sum_Temp + Temp_K);
